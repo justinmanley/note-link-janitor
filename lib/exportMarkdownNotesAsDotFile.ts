@@ -1,15 +1,28 @@
 import readAllNotes, { Note } from './readAllNotes';
 
+const escapeRegExp = (string) =>
+    string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+
+const replaceAll = (str, find, replace) =>
+    str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+
+
+const escape = (input: string) =>
+    replaceAll(
+        replaceAll(input, `\\`, `\\`),
+        `"`,
+        `\\"`
+    )
 
 export const formatMarkdownNotesAsDotFile = (
     notes: Record<string, Note>,
 ): string => {
     const nodes = Object.entries(notes).map(
-        ([_, note]) => `  "${note.title}" [ label = "${note.title}"];`,
+        ([_, note]) => `  "${escape(note.title)}" [ label = "${escape(note.title)}"];`,
     );
     const edges = Object.entries(notes).flatMap(
         ([_, note]) => note.links.map(
-            (link) => `  "${note.title}" -> "${link.targetTitle}";`,
+            (link) => `  "${escape(note.title)}" -> "${escape(link.targetTitle)}";`,
         ),
     );
 

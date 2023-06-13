@@ -7,14 +7,9 @@ import * as path from "path";
 import createLinkMap from "./lib/createLinkMap";
 import readAllNotes from "./lib/readAllNotes";
 import updateBacklinks from "./lib/updateBacklinks";
+import { exportMarkdownNotesAsDotFile } from "./lib/exportMarkdownNotesAsDotFile";
 
-(async () => {
-  const baseNotePath = process.argv[2];
-  if (!baseNotePath || baseNotePath === "--help") {
-    console.log("Usage: note-link-janitor [NOTE_DIRECTORY]");
-    return;
-  }
-
+const addBacklinks = async (baseNotePath: string) => {
   const notes = await readAllNotes(baseNotePath);
   const linkMap = createLinkMap(Object.values(notes));
 
@@ -61,4 +56,30 @@ import updateBacklinks from "./lib/updateBacklinks";
       }
     })
   );
+
+}
+
+const printUsage = () => 
+    console.log("Usage: note-link-janitor {add-backlinks,print-graph} [NOTE_DIRECTORY]");
+
+(async () => {
+  const command = process.argv[2];
+  if (!command || (command !== "add-backlinks" && command !== "print-graph")) {
+    printUsage();
+    return;
+  }
+
+  const baseNotePath = process.argv[3];
+  if (!baseNotePath || baseNotePath === "--help") {
+    printUsage();
+    return;
+  }
+
+  if (command === "add-backlinks") {
+    await addBacklinks(baseNotePath);
+  }
+
+  if (command === "print-graph") {
+    await exportMarkdownNotesAsDotFile(baseNotePath);
+  }
 })();

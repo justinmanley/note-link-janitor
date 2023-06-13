@@ -12,7 +12,8 @@ const missingTitleSentinel = { type: "missingTitle" } as const;
 const headingFinder = processor().use(() => tree =>
   find(tree, { type: "heading", depth: 1 }) || missingTitleSentinel
 );
-interface Note {
+
+export interface Note {
   title: string;
   links: NoteLinkEntry[];
   noteContents: string;
